@@ -22,7 +22,6 @@ BF = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
 
 
 class Feature(NamedTuple):
-    """(keypoints, descriptors)"""
     keypoints: Sequence[cv2.KeyPoint]  # noqa
     descriptors: np.ndarray
 
@@ -57,19 +56,18 @@ def count_rows(pic: Image.Image) -> tuple[int, int]:
                 CHAT_WINDOW_AREA[3] - PROFILE_SIZE // 2
             )
 
-            return (
-                    match_object.distance < THRESHOLD
-                    and (
-                            Y_LIMIT[0]
-                            <= (
-                                    feature.keypoints[match_object.trainIdx].pt[1]
-                                    - feature.keypoints[match_object.trainIdx].pt[1]
-                            )
-                            < Y_LIMIT[1]
+            return bool(
+                match_object.distance < THRESHOLD
+                and (
+                    Y_LIMIT[0]
+                    <= (
+                        feature.keypoints[match_object.trainIdx].pt[1]
+                        - feature.keypoints[match_object.trainIdx].pt[1]
                     )
+                    < Y_LIMIT[1]
+                )
                 # pt: cv2.typing.Point2f, which is defined as
                 # Sequence[x: float, y: float] and marks all points that are matched
-
             )
 
         return sum(map(judge, matches))
@@ -110,5 +108,6 @@ def load_profile_ext_feature() -> tuple[Feature, Feature]:
         )
 
     return _load_profile_ext_feature(profiles[0]), _load_profile_ext_feature(profiles[1])
+
 
 FEATURES = load_profile_ext_feature()
